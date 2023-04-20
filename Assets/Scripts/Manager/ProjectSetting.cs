@@ -6,13 +6,12 @@ using VContainer.Unity;
 
 public class ProjectSetting : IStartable
 {
-    [Inject]
-    GameManager gameManager;
+    [Inject] GameManager gameManager;
 
     public void Start()
     {
         // Vcontainer Initializer
-        Debug.Log("Start Vcontainer");
+        Debug.Log("Start: Vcontainer");
         gameManager.Init();
     }
 
