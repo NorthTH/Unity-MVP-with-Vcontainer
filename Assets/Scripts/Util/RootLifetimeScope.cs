@@ -6,7 +6,7 @@ using VContainer.Unity;
 public sealed partial class RootLifetimeScope : LifetimeScope
 {
     [SerializeField]
-    GameManager GameManagerPrefab;
+    GameManager gameManagerPrefab;
 
     partial void TableRegister(IContainerBuilder builder);
     partial void UserDataRegister(IContainerBuilder builder);
@@ -18,9 +18,9 @@ public sealed partial class RootLifetimeScope : LifetimeScope
         UserDataRegister(builder);
         UtilityRegister(builder);
 
-        builder.Register<SceneLoader>(Lifetime.Singleton).AsImplementedInterfaces();
+        builder.Register<SceneLoader>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         builder.Register<ProjectSetting>(Lifetime.Singleton);
         builder.RegisterEntryPoint<ProjectSetting>(Lifetime.Singleton);
-        builder.RegisterComponentInNewPrefab<GameManager>(GameManagerPrefab, Lifetime.Singleton);
+        builder.RegisterComponentInNewPrefab<GameManager>(gameManagerPrefab, Lifetime.Singleton);
     }
 }

@@ -8,13 +8,21 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     [Inject] ISceneLoader sceneLoader;
 
+    [SerializeField] GameObject touchBlockObj;
     [SerializeField] GameObject Curtain;
 
     public void Initialize()
     {
         Debug.Log($"Initialize: GameManager");
         DontDestroyOnLoad(this);
-        sceneLoader.Initialize();
+
+        sceneLoader.SetUp(() =>
+        {
+            touchBlockObj.SetActive(true);
+        }, () =>
+        {
+            touchBlockObj.SetActive(false);
+        }, SetShowLoadingCurtain);
     }
 
     public void SetShowLoadingCurtain(bool value)

@@ -11,13 +11,19 @@ namespace MVP
 {
     public interface ISceneLoader
     {
-        public void Initialize();
+        public void SetUp(Action PreAction, Action PostAction, Action<bool> SetShowCurtain);
     }
 
     public partial class SceneLoader : ISceneLoader
     {
+        public static SceneLoader Instance;
+
         readonly LifetimeScope rootLifetimeScope;
         Dictionary<string, LifetimeScope> lifetimeScopeDic;
+
+        Action PreAction;
+        Action PostAction;
+        Action<bool> SetShowCurtain;
 
         public LifetimeScope LastLifetimeScope
         {
@@ -31,9 +37,12 @@ namespace MVP
         public SceneLoader(LifetimeScope rootLifetimeScope)
         {
             this.rootLifetimeScope = rootLifetimeScope;
+            Instance = this;
+
+            Initialize();
         }
 
-        public void Initialize()
+        void Initialize()
         {
             Debug.Log("Initialize SceneLoader");
             lifetimeScopeDic = new Dictionary<string, LifetimeScope>();
@@ -61,34 +70,55 @@ namespace MVP
             };
         }
 
-        public UniTask LoadScene(string sceneName, SceceDataPack sceceDataPack = null)
+        public void SetUp(Action PreAction, Action PostAction, Action<bool> SetShowCurtain)
         {
-            return LoadScene(sceneName, LoadSceneMode.Single, sceceDataPack);
+            this.PreAction = PreAction;
+            this.PostAction = PostAction;
+            this.SetShowCurtain = SetShowCurtain;
         }
 
-        public UniTask LoadScene(string sceneName, LoadSceneMode mode, SceceDataPack sceceDataPack)
+        public UniTask LoadScene(string sceneName)
         {
-            return InternalLoadScene(sceneName, mode, sceceDataPack);
+            return LoadScene(sceneName, LoadSceneMode.Single, new SceneDataPack());
         }
 
-        UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, SceceDataPack sceceDataPack)
+        public UniTask LoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceceDataPack = null)
+        {
+            return InternalLoadScene(sceneName, mode, sceceDataPack ?? new SceneDataPack());
+        }
+
+        UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceceDataPack)
         {
             var utcs = new UniTaskCompletionSource();
 
-            InternalLoadScene(sceneName, mode, () =>
+            if (mode == LoadSceneMode.Single)
+                SetShowCurtain.Invoke(true);
+
+            PreAction?.Invoke();
+            InternalLoadScene(sceneName, mode, sceceDataPack, () =>
             {
                 utcs.TrySetResult();
+                if (mode == LoadSceneMode.Single)
+                    SetShowCurtain.Invoke(false);
+                PostAction?.Invoke();
             }).Forget();
 
             return utcs.Task;
         }
 
-        async UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, Action OnComplete)
+        async UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceneDataPack, Action OnComplete)
         {
             if (mode == LoadSceneMode.Single)
             {
                 lifetimeScopeDic.Clear();
                 using (LifetimeScope.EnqueueParent(rootLifetimeScope))
+                using (LifetimeScope.Enqueue(builder =>
+                {
+                    builder.Register<SceneDataPack>(container =>
+                    {
+                        return sceneDataPack;
+                    }, Lifetime.Scoped);
+                }))
                 {
                     await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
                 }
@@ -104,6 +134,10 @@ namespace MVP
                         var parentContainer = new ParentContainer(parent.Container);
                         return parentContainer;
                     }, Lifetime.Scoped);
+                    builder.Register<SceneDataPack>(container =>
+                    {
+                        return sceneDataPack;
+                    }, Lifetime.Scoped);
                 }))
                 {
                     await SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
@@ -116,6 +150,8 @@ namespace MVP
     public class ParentContainer
     {
         IObjectResolver container;
+        public IObjectResolver Container => container;
+
         public ParentContainer(IObjectResolver container)
         {
             this.container = container;
@@ -132,5 +168,8 @@ namespace MVP
         }
     }
 
-    public class SceceDataPack { }
+    public class SceneDataPack
+    {
+        public object SendData;
+    }
 }

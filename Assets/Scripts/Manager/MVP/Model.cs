@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+
 namespace MVP
 {
     public interface IModel
