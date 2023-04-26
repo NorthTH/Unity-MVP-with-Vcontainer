@@ -1,4 +1,5 @@
 using UnityEngine;
+using MVP;
 using VContainer;
 using VContainer.Unity;
 
@@ -17,8 +18,9 @@ public sealed partial class RootLifetimeScope : LifetimeScope
         UserDataRegister(builder);
         UtilityRegister(builder);
 
+        builder.Register<SceneLoader>(Lifetime.Singleton).AsImplementedInterfaces();
         builder.Register<ProjectSetting>(Lifetime.Singleton);
         builder.RegisterEntryPoint<ProjectSetting>(Lifetime.Singleton);
-        builder.RegisterComponentInNewPrefab<GameManager>(GameManagerPrefab, Lifetime.Singleton).DontDestroyOnLoad();
+        builder.RegisterComponentInNewPrefab<GameManager>(GameManagerPrefab, Lifetime.Singleton);
     }
 }

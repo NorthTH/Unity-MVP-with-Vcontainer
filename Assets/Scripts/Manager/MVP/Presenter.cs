@@ -3,7 +3,7 @@ using VContainer.Unity;
 
 namespace MVP
 {
-    public abstract class Presenter<TModel, TView> : IStartable where TModel : IModel where TView : View
+    public abstract class Presenter<TModel, TView> : IStartable where TModel : IModel where TView : IView
     {
         protected TModel Model { get; }
         protected TView View { get; }
@@ -16,7 +16,7 @@ namespace MVP
 
         public void Start()
         {
-            Debug.Log($"Start: {this}");
+            Debug.Log($"Initialize: {this}");
             Initialize();
 
             Model.Initialize();

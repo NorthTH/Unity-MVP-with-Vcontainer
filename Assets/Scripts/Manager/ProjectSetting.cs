@@ -12,14 +12,12 @@ public class ProjectSetting : IStartable
     {
         // Vcontainer Initializer
         Debug.Log("Start: Vcontainer");
-        gameManager.Init();
+        gameManager.Initialize();
     }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
     public static void Init()
     {
         // Project Initializer
-        // GameObject OverScene = GameObject.Instantiate(Resources.Load("OverScene")) as GameObject;
-        // GameObject.DontDestroyOnLoad(OverScene);
     }
 }

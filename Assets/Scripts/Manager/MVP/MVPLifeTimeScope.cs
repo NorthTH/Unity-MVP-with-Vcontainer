@@ -6,7 +6,7 @@ namespace MVP
 {
     public abstract class MVPLifetimeScope<TPresenter, TModel, TView> : LifetimeScope, IMVPLifetimeScope
        where TPresenter : Presenter<TModel, TView>
-       where TModel : IModel
+       where TModel : Model
        where TView : View
     {
         [SerializeField]
