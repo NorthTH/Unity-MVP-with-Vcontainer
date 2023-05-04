@@ -8,7 +8,7 @@ namespace Sample
 
         public override void Initialize()
         {
-            SetSceneCompleteLoaded();
+            SceneDataPack?.SetSceneComplete();
         }
     }
 

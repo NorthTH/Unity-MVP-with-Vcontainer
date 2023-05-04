@@ -249,7 +249,7 @@ namespace {0}
 
         public override void Initialize() 
         {{
-            SetSceneCompleteLoaded();
+            SceneDataPack?.SetSceneComplete();
         }}
     }}
 

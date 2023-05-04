@@ -19,12 +19,6 @@ namespace MVP
 
         public abstract void Initialize();
 
-        protected void SetSceneCompleteLoaded()
-        {
-            if (SceneDataPack != null)
-                SceneDataPack.SceneUtcs.TrySetResult();
-        }
-
         public virtual void Refresh() { }
 
         public virtual void ReceiveData(object data) { }

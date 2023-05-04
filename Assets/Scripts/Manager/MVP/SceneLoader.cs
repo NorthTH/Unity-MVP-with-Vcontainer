@@ -216,11 +216,17 @@ namespace MVP
         {
             return (T)data;
         }
+
+        public void SetSceneComplete()
+        {
+            if (SceneUtcs != null)
+                SceneUtcs.TrySetResult();
+        }
     }
 
     public interface ISceneDataPack
     {
-        public UniTaskCompletionSource SceneUtcs { get; }
         public T GetData<T>() where T : notnull;
+        public void SetSceneComplete();
     }
 }
