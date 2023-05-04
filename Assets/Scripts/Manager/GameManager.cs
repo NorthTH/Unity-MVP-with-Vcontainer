@@ -16,10 +16,10 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         Debug.Log($"Initialize: GameManager");
         DontDestroyOnLoad(this);
 
-        sceneLoader.SetUp(() =>
+        sceneLoader.SetUp(scene =>
         {
             touchBlockObj.SetActive(true);
-        }, () =>
+        }, scene =>
         {
             touchBlockObj.SetActive(false);
         }, SetShowLoadingCurtain);

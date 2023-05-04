@@ -107,7 +107,7 @@ namespace MVP
                 // create camera
                 if (sceneMode == 0)
                 {
-                    var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LocalData/Common/Main Camera.prefab");
+                    var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LocalData/Common/MainCamera.prefab");
                     var cameraGo = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
                     Debug.Assert(cameraGo != null, "cameraGo != null");
                     mainCamera = cameraGo.GetComponent<Camera>();
@@ -222,13 +222,14 @@ namespace MVP
             }
 
             private static string PresenterTemplate = @"using MVP;
+using VContainer;
 
 namespace {0}
 {{
     public sealed class {1}ScenePresenter : Presenter<{1}SceneModel, {1}SceneView>
     {{
-        public {1}ScenePresenter({1}SceneModel model, {1}SceneView view) : 
-            base(model, view)
+        public {1}ScenePresenter({1}SceneModel model, {1}SceneView view, IObjectResolver container) :
+            base(model, view, container)
         {{
         }}
 
@@ -246,7 +247,10 @@ namespace {0}
     {{
         public {1}SceneModel() {{ }}
 
-        public override void Initialize() {{ }}
+        public override void Initialize() 
+        {{
+            SetSceneCompleteLoaded();
+        }}
     }}
 
     public interface I{1}SceneModel {{ }}

@@ -6,7 +6,10 @@ namespace Sample
     {
         public Sample01SceneModel() { }
 
-        public override void Initialize() { }
+        public override void Initialize()
+        {
+            SetSceneCompleteLoaded();
+        }
     }
 
     public interface ISample01SceneModel { }
