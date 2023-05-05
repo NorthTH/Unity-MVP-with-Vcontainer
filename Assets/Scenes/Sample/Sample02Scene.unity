@@ -322,6 +322,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6675443605454793341, guid: 775e132fb04054935a98523ef2378b90, type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 347802865}
+    - target: {fileID: 6675443605454793341, guid: 775e132fb04054935a98523ef2378b90, type: 3}
       propertyPath: m_AdditionalShaderChannelsFlag
       value: 25
       objectReference: {fileID: 0}
@@ -552,6 +556,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f71aa125581124def8e3363e81ec2779, type: 3}
+--- !u!20 &347802865 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1186918307053943780, guid: f71aa125581124def8e3363e81ec2779, type: 3}
+  m_PrefabInstance: {fileID: 347802864}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &532487872
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +730,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 0
+  m_enableWordWrapping: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
@@ -1203,7 +1212,7 @@ MonoBehaviour:
   m_InputType: 0
   m_AsteriskChar: 42
   m_KeyboardType: 0
-  m_LineType: 0
+  m_LineType: 1
   m_HideMobileInput: 0
   m_HideSoftKeyboard: 0
   m_CharacterValidation: 0

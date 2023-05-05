@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using MVP;
 
@@ -8,6 +9,17 @@ using MVP;
 public class ReturnButton : MonoBehaviour
 {
     Button returnBtn;
+
+    public UnityEvent onClick;
+    public UnityEvent OnClick
+    {
+        get
+        {
+            if (onClick == null)
+                onClick = new UnityEvent();
+            return onClick;
+        }
+    }
 
     void Awake()
     {
@@ -17,6 +29,9 @@ public class ReturnButton : MonoBehaviour
 
     void ReturnBtn_OnClick()
     {
-        _ = HistoryManager.ReturnScene();
+        if (onClick != null)
+            onClick.Invoke();
+        else
+            _ = HistoryManager.ReturnScene();
     }
 }

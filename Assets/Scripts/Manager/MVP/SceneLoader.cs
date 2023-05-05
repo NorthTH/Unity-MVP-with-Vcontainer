@@ -219,8 +219,7 @@ namespace MVP
 
         public void SetSceneComplete()
         {
-            if (SceneUtcs != null)
-                SceneUtcs.TrySetResult();
+            SceneUtcs?.TrySetResult();
         }
     }
 
