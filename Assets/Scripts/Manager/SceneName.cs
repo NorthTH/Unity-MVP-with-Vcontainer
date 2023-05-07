@@ -8,4 +8,5 @@ public struct SceneName
     public const string Sample04Sub02 = "Sample04Sub02Scene";
     public const string Sample04Sub03 = "Sample04Sub03Scene";
     public const string Sample04Sub04 = "Sample04Sub04Scene";
+    public const string SampleAdvance01 = "SampleAdvance01Scene";
 }

@@ -10,7 +10,7 @@ public class ReturnButton : MonoBehaviour
 {
     Button returnBtn;
 
-    public UnityEvent onClick;
+    UnityEvent onClick;
     public UnityEvent OnClick
     {
         get
