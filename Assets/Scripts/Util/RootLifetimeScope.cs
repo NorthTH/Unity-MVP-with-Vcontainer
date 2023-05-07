@@ -1,5 +1,7 @@
 using UnityEngine;
 using MVP;
+using Manager.UserData;
+using Manager.TableData;
 using VContainer;
 using VContainer.Unity;
 
@@ -18,6 +20,8 @@ public sealed partial class RootLifetimeScope : LifetimeScope
         UserDataRegister(builder);
         UtilityRegister(builder);
 
+        builder.Register<UserData>(Lifetime.Singleton).AsImplementedInterfaces();
+        builder.Register<TableData>(Lifetime.Singleton).AsImplementedInterfaces();
         builder.Register<SceneLoader>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
         builder.Register<ProjectSetting>(Lifetime.Singleton);
         builder.RegisterEntryPoint<ProjectSetting>(Lifetime.Singleton);
