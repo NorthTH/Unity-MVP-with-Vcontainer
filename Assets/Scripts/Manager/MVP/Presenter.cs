@@ -30,6 +30,9 @@ namespace MVP
             }
             catch
             {
+                var sceceDataPack = new SceneDataPack(null);
+                Model.SetUp(sceceDataPack);
+                View.SetUp(sceceDataPack);
                 Debug.LogWarning("This Warning alway happen when first's scene loaded");
             }
 

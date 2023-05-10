@@ -212,8 +212,10 @@ namespace MVP
             this.SceneUtcs = sceneUtcs;
         }
 
-        public T GetData<T>() where T : notnull
+        public T GetData<T>() where T : notnull, new()
         {
+            if (data == null)
+                data = new T();
             return (T)data;
         }
 
@@ -225,7 +227,7 @@ namespace MVP
 
     public interface ISceneDataPack
     {
-        public T GetData<T>() where T : notnull;
+        public T GetData<T>() where T : notnull, new();
         public void SetSceneComplete();
     }
 }

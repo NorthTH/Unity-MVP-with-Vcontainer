@@ -16,9 +16,8 @@ namespace MVP
         private static string actualSingleSceneName = SceneManager.GetActiveScene().name;
         private static List<string> actualAdditiveSceneName = new List<string>();
         public static string GetActualSingleSceneName() => actualSingleSceneName;
-        public static string GetLastLoadedSceneName() => actualAdditiveSceneName.Count > 0 ? actualAdditiveSceneName[actualAdditiveSceneName.Count - 1] : actualSingleSceneName;
+        public static string GetLastLoadedSceneName() => _history.Peek().scene;
         public static string GetPreviousLoadedSceneName() => actualAdditiveSceneName.Count > 1 ? actualAdditiveSceneName[actualAdditiveSceneName.Count - 2] : actualSingleSceneName;
-        public static int GetDupicateSceneNameInHistory(string name) => _history.Count(x => x.scene == name);
 
         static Action<bool> SetShowLoadingCurtain;
         static Func<string, LoadSceneMode, SceneDataPack, UniTask> LoadSceneAsync;
@@ -52,6 +51,16 @@ namespace MVP
                 actualAdditiveSceneName.Add(scene);
             }
             _history.Push((scene, loadSceneMode, sceneDataPack));
+        }
+
+        public static async UniTask RemoveAllAdditiveScene()
+        {
+            var tempActualAdditiveSceneList = new List<string>(actualAdditiveSceneName);
+            tempActualAdditiveSceneList.Reverse();
+            foreach (var scene in tempActualAdditiveSceneList)
+            {
+                await RemoveAdditiveScene(scene);
+            }
         }
 
         public static async UniTask RemoveAllAdditiveScene(params string[] sceneNameParams)
@@ -108,13 +117,12 @@ namespace MVP
             }
         }
 
-
         /// <summary>
         /// 履歴がある場合、ひとつ前のシーンに戻ります。
         /// </summary>
         /// <param name="scene">指定しない場合最後に開いたシーンの名前と同じ名前のシーンを削除します。</param>
         /// <returns></returns>
-        public static async UniTask ReturnScene(Scene scene = default)
+        public static async UniTask ReturnScene(bool returnAllCurrentScene = false)
         {
             Debug.Assert(_history.Count != 0, "_history.Count != 0");
 
@@ -122,6 +130,17 @@ namespace MVP
             {
                 Debug.LogWarning("No scenes in history");
                 return;
+            }
+
+            if (returnAllCurrentScene)
+            {
+                SetShowLoadingCurtain?.Invoke(true);
+                await RemoveAllAdditiveScene();
+                if (_history.Count <= 1)
+                {
+                    SetShowLoadingCurtain?.Invoke(false);
+                    return;
+                }
             }
 
             // 現在表示しているシーンをスタックから取得
@@ -160,25 +179,11 @@ namespace MVP
                             additive.sceneDataPack);
                     }
                     SetShowLoadingCurtain?.Invoke(false);
-
                     break;
                 case LoadSceneMode.Additive:
-                    if (scene.name != null)
-                    {
-                        actualAdditiveSceneName.Remove(scene.name);
-                        // シーンが正しく渡されていたら対象のシーンをアンロード
-                        await SceneManager.UnloadSceneAsync(scene);
-                    }
-                    else
-                    {
-                        // 複数の同じシーンを開く場合、文字列で一意にならないのでチェック
-                        // 一意じゃない場合はミスっぽいので、CheckIsUniqueScene でエラーを吐く
-                        var sceneName = currentScene.ToString();
-                        CheckIsUniqueScene(sceneName);
-                        actualAdditiveSceneName.Remove(sceneName);
-                        await SceneManager.UnloadSceneAsync(sceneName);
-                    }
-
+                    CheckIsUniqueScene(currentScene);
+                    actualAdditiveSceneName.Remove(currentScene);
+                    await SceneManager.UnloadSceneAsync(currentScene);
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }
