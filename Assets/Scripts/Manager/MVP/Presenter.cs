@@ -36,8 +36,8 @@ namespace MVP
                 Debug.LogWarning("This Warning alway happen when first's scene loaded");
             }
 
-            Model.Initialize();
             View.Initialize();
+            Model.Initialize();
         }
 
         protected abstract void Initialize();
