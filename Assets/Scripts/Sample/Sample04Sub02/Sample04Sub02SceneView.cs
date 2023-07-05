@@ -29,8 +29,8 @@ namespace Sample
             float.TryParse(inputList[2].text, out peopleData.height);
             peopleData.subject = inputList[3].text;
 
-            var parentView = container.Resolve<ParentContainer>().GetIView();
-            parentView.ReceiveData(peopleData);
+            var parentPresenter = container.Resolve<ParentPresenter>().Presenter;
+            parentPresenter.ReceiveData(peopleData);
             _ = HistoryManager.ReturnScene();
         }
     }

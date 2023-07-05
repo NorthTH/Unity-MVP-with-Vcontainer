@@ -67,22 +67,22 @@ namespace Sample
             textInput.text = "Call Refresh from Sub04Scene : Sample05Button is set Active";
         }
 
-        public override void ReceiveData(object data)
-        {
-            textInput.text = string.Empty;
-            switch (data)
-            {
-                case List<string> textList:  // ReceiveFromSub01
-                    textList.ForEach(x => textInput.text += $"{x}\n");
-                    break;
-                case StudentData studentData:  // ReceiveFromSub02
-                    textInput.text = $"Name: {studentData.name}\nAge: {studentData.age}\nHeight: {studentData.height}\nSubject: {studentData.subject}";
-                    break;
-                case WorkerData workerData:  // ReceiveFromSub03
-                    textInput.text = $"Name: {workerData.name}\nAge: {workerData.age}\nHeight: {workerData.height}\nJob: {workerData.job}";
-                    break;
-            }
-        }
+        // public override void ReceiveData(object data)
+        // {
+        //     textInput.text = string.Empty;
+        //     switch (data)
+        //     {
+        //         case List<string> textList:  // ReceiveFromSub01
+        //             textList.ForEach(x => textInput.text += $"{x}\n");
+        //             break;
+        //         case StudentData studentData:  // ReceiveFromSub02
+        //             textInput.text = $"Name: {studentData.name}\nAge: {studentData.age}\nHeight: {studentData.height}\nSubject: {studentData.subject}";
+        //             break;
+        //         case WorkerData workerData:  // ReceiveFromSub03
+        //             textInput.text = $"Name: {workerData.name}\nAge: {workerData.age}\nHeight: {workerData.height}\nJob: {workerData.job}";
+        //             break;
+        //     }
+        // }
     }
 
     public interface ISample04SceneView { }

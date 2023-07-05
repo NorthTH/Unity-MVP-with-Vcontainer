@@ -16,10 +16,25 @@ namespace MVP
         {
             base.Configure(builder);
 
-            builder.Register<TModel>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
-            builder.RegisterComponent(view).AsSelf().AsImplementedInterfaces();
-            builder.Register<TPresenter>(Lifetime.Scoped);
-            builder.RegisterEntryPoint<TPresenter>(Lifetime.Scoped);
+            builder.Register<TModel>(Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
+            builder.RegisterComponent(view).AsImplementedInterfaces();
+            builder.Register<TPresenter>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
+            builder.RegisterEntryPoint<EntryPoint>(Lifetime.Scoped);
+        }
+
+        public class EntryPoint : IStartable
+        {
+            TPresenter Presenter;
+
+            private EntryPoint(TPresenter Presenter)
+            {
+                this.Presenter = Presenter;
+            }
+
+            public void Start()
+            {
+                Presenter.Initialize();
+            }
         }
 
 #if UNITY_EDITOR

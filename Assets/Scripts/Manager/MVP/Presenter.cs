@@ -1,10 +1,10 @@
 using UnityEngine;
 using VContainer;
-using VContainer.Unity;
 
 namespace MVP
 {
-    public abstract class Presenter<TModel, TView> : IStartable where TModel : IModel where TView : IView
+    public abstract class Presenter<TModel, TView> : IPresenter
+     where TModel : IModel where TView : IView
     {
         protected IObjectResolver Container;
         protected TModel Model { get; }
@@ -17,10 +17,9 @@ namespace MVP
             Container = container;
         }
 
-        public void Start()
+        public void Initialize()
         {
             Debug.Log($"Initialize: {this}");
-            Initialize();
 
             try
             {
@@ -30,16 +29,32 @@ namespace MVP
             }
             catch
             {
-                var sceceDataPack = new SceneDataPack(null);
+                var sceceDataPack = HistoryManager.GetFirstTimeSceneDataPack();
                 Model.SetUp(sceceDataPack);
                 View.SetUp(sceceDataPack);
                 Debug.LogWarning("This Warning alway happen when first's scene loaded");
             }
-
-            View.Initialize();
             Model.Initialize();
+            View.Initialize();
+
+            Model.PostInitialize();
+            View.PostInitialize();
         }
 
-        protected abstract void Initialize();
+        public virtual void ReceiveData(object data)
+        {
+            Model.ReceiveData(data);
+            View.Refresh();
+        }
+        public virtual void Refresh()
+        {
+            View.Refresh();
+        }
+    }
+
+    public interface IPresenter
+    {
+        void ReceiveData(object data);
+        void Refresh();
     }
 }

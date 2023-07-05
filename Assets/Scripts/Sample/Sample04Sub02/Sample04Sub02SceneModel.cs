@@ -6,9 +6,9 @@ namespace Sample
     {
         public Sample04Sub02SceneModel() { }
 
-        public override void Initialize() 
+        public override void Initialize()
         {
-            SceneDataPack?.SetSceneComplete();
+
         }
     }
 

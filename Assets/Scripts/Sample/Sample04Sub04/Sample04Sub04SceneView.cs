@@ -18,8 +18,8 @@ namespace Sample
 
         void ReturnButton_OnClick()
         {
-            var parentView = container.Resolve<ParentContainer>().GetIView();
-            parentView.Refresh();
+            var parentPresenter = container.Resolve<ParentPresenter>().Presenter;
+            parentPresenter.Refresh();
             _ = HistoryManager.ReturnScene();
         }
     }

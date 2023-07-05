@@ -226,15 +226,15 @@ using VContainer;
 
 namespace {0}
 {{
-    public sealed class {1}ScenePresenter : Presenter<{1}SceneModel, {1}SceneView>
+    public sealed class {1}ScenePresenter : Presenter<{1}SceneModel, {1}SceneView>, I{1}ScenePresenter
     {{
         public {1}ScenePresenter({1}SceneModel model, {1}SceneView view, IObjectResolver container) :
             base(model, view, container)
         {{
         }}
-
-        protected override void Initialize() {{ }}
     }}
+
+    public interface I{1}ScenePresenter {{ }}
 }}
 ";
 
@@ -249,11 +249,13 @@ namespace {0}
 
         public override void Initialize() 
         {{
-            SceneDataPack?.SetSceneComplete();
+
         }}
     }}
 
     public interface I{1}SceneModel {{ }}
+
+    public class I{1}SceneDataPack {{ }}
 }}
 ";
 

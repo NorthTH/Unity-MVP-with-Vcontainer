@@ -18,11 +18,12 @@ namespace MVP
         public static string GetActualSingleSceneName() => actualSingleSceneName;
         public static string GetLastLoadedSceneName() => _history.Peek().scene;
         public static string GetPreviousLoadedSceneName() => actualAdditiveSceneName.Count > 1 ? actualAdditiveSceneName[actualAdditiveSceneName.Count - 2] : actualSingleSceneName;
+        public static SceneDataPack GetFirstTimeSceneDataPack() => _history.Count == 1 ? _history.Peek().sceneDataPack : null;
 
-        static Action<bool> SetShowLoadingCurtain;
+        static Func<bool, UniTask> SetShowLoadingCurtain;
         static Func<string, LoadSceneMode, SceneDataPack, UniTask> LoadSceneAsync;
 
-        public static void Initialize(Action<bool> setShowLoadingCurtain = null, Func<string, LoadSceneMode, SceneDataPack, UniTask> returnLoadSceneAsync = null)
+        public static void Initialize(Func<bool, UniTask> setShowLoadingCurtain = null, Func<string, LoadSceneMode, SceneDataPack, UniTask> returnLoadSceneAsync = null)
         {
             SetShowLoadingCurtain = setShowLoadingCurtain;
             LoadSceneAsync = returnLoadSceneAsync;
@@ -122,7 +123,7 @@ namespace MVP
         /// </summary>
         /// <param name="scene">指定しない場合最後に開いたシーンの名前と同じ名前のシーンを削除します。</param>
         /// <returns></returns>
-        public static async UniTask ReturnScene(bool returnAllCurrentScene = false)
+        public static async UniTask ReturnScene(bool DirectSingleReturn = false)
         {
             Debug.Assert(_history.Count != 0, "_history.Count != 0");
 
@@ -132,13 +133,13 @@ namespace MVP
                 return;
             }
 
-            if (returnAllCurrentScene)
+            if (DirectSingleReturn)
             {
-                SetShowLoadingCurtain?.Invoke(true);
+                await SetShowLoadingCurtain.Invoke(true);
                 await RemoveAllAdditiveScene();
                 if (_history.Count <= 1)
                 {
-                    SetShowLoadingCurtain?.Invoke(false);
+                    await SetShowLoadingCurtain.Invoke(false);
                     return;
                 }
             }
@@ -148,7 +149,8 @@ namespace MVP
             switch (loadSceneMode)
             {
                 case LoadSceneMode.Single:
-                    SetShowLoadingCurtain?.Invoke(true);
+                    if (DirectSingleReturn)
+                        await SetShowLoadingCurtain.Invoke(true);
                     actualAdditiveSceneName.Remove(currentScene);
 
                     // 前の画面の状態を復元するため、Additiveだったシーンロードを再度再現
@@ -178,7 +180,7 @@ namespace MVP
                             additive.loadSceneMode,
                             additive.sceneDataPack);
                     }
-                    SetShowLoadingCurtain?.Invoke(false);
+                    await SetShowLoadingCurtain.Invoke(false);
                     break;
                 case LoadSceneMode.Additive:
                     CheckIsUniqueScene(currentScene);

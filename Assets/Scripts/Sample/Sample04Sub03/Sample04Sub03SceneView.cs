@@ -36,8 +36,8 @@ namespace Sample
             float.TryParse(inputList[2].text, out workerData.height);
             workerData.job = inputList[3].text;
 
-            var parentView = container.Resolve<ParentContainer>().GetIView();
-            parentView.ReceiveData(workerData);
+            var parentPresenter = container.Resolve<ParentPresenter>().Presenter;
+            parentPresenter.ReceiveData(workerData);
             _ = HistoryManager.ReturnScene();
         }
     }

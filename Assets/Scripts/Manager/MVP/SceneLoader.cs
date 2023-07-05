@@ -11,7 +11,7 @@ namespace MVP
 {
     public interface ISceneLoader
     {
-        public void SetUp(Action<string> PreAction, Action<string> PostAction, Action<bool> SetShowCurtain);
+        public void SetUp(Action<string> PreAction, Action<string> PostAction, Func<bool, UniTask> SetShowCurtain);
     }
 
     public partial class SceneLoader : ISceneLoader
@@ -23,7 +23,7 @@ namespace MVP
 
         Action<string> PreAction;
         Action<string> PostAction;
-        Action<bool> SetShowCurtain;
+        Func<bool, UniTask> SetShowCurtain;
 
         public IObjectResolver LastContainer
         {
@@ -70,7 +70,7 @@ namespace MVP
             };
         }
 
-        public void SetUp(Action<string> PreAction, Action<string> PostAction, Action<bool> SetShowCurtain)
+        public void SetUp(Action<string> PreAction, Action<string> PostAction, Func<bool, UniTask> SetShowCurtain)
         {
             this.PreAction = PreAction;
             this.PostAction = PostAction;
@@ -89,29 +89,38 @@ namespace MVP
 
         public UniTask LoadScene(string sceneName, LoadSceneMode mode, object data = null)
         {
-            return InternalLoadScene(sceneName, mode, new SceneDataPack(data));
+            return InternalLoadScene(sceneName, mode, new SceneDataPack(data), mode == LoadSceneMode.Single);
         }
 
-        UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceceDataPack)
+        UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceceDataPack, bool isShowCurtain)
         {
             var utcs = new UniTaskCompletionSource();
-            UniTaskCompletionSource sceneUtcs = new UniTaskCompletionSource();
-            sceceDataPack.SetUniTaskCompletionSource(sceneUtcs);
+            sceceDataPack.SetUniTaskCompletionSource(utcs);
 
-            if (mode == LoadSceneMode.Single)
-                SetShowCurtain.Invoke(true);
+            var showCurtainTask = UniTask.CompletedTask;
+            if (isShowCurtain)
+            {
+                showCurtainTask = SetShowCurtain.Invoke(true);
+            }
 
             PreAction?.Invoke(sceneName);
             HistoryManager.AddScene(sceneName, mode, sceceDataPack);
 
-            InternalLoadScene(sceneName, mode, sceceDataPack, async () =>
+            LoadScene().Forget();
+            async UniTaskVoid LoadScene()
             {
-                PostAction?.Invoke(sceneName);
-                await (sceneUtcs?.Task ?? UniTask.CompletedTask);
-                if (mode == LoadSceneMode.Single)
-                    SetShowCurtain.Invoke(false);
-                utcs.TrySetResult();
-            }).Forget();
+                await showCurtainTask;
+
+                InternalLoadScene(sceneName, mode, sceceDataPack, async () =>
+                {
+                    PostAction?.Invoke(sceneName);
+                    await utcs.Task;
+                    if (mode == LoadSceneMode.Single)
+                    {
+                        await SetShowCurtain.Invoke(false);
+                    }
+                }).Forget();
+            }
 
             return utcs.Task;
         }
@@ -119,8 +128,7 @@ namespace MVP
         UniTask ReturnLoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceceDataPack)
         {
             var utcs = new UniTaskCompletionSource();
-            UniTaskCompletionSource sceneUtcs = new UniTaskCompletionSource();
-            sceceDataPack.SetUniTaskCompletionSource(sceneUtcs);
+            sceceDataPack.SetUniTaskCompletionSource(utcs);
 
             PreAction?.Invoke(sceneName);
             HistoryManager.AddScene(sceneName, mode, sceceDataPack);
@@ -128,8 +136,7 @@ namespace MVP
             InternalLoadScene(sceneName, mode, sceceDataPack, async () =>
             {
                 PostAction?.Invoke(sceneName);
-                await (sceneUtcs?.Task ?? UniTask.CompletedTask);
-                utcs.TrySetResult();
+                await utcs.Task;
             }).Forget();
 
             return utcs.Task;
@@ -158,9 +165,9 @@ namespace MVP
                 using (LifetimeScope.EnqueueParent(parent))
                 using (LifetimeScope.Enqueue(builder =>
                 {
-                    builder.Register<ParentContainer>(container =>
+                    builder.Register<ParentPresenter>(container =>
                     {
-                        var parentContainer = new ParentContainer(parent.Container);
+                        var parentContainer = new ParentPresenter(parent.Container.Resolve<IPresenter>());
                         return parentContainer;
                     }, Lifetime.Scoped);
                     builder.Register<SceneDataPack>(container =>
@@ -176,24 +183,13 @@ namespace MVP
         }
     }
 
-    public class ParentContainer
+    public class ParentPresenter
     {
-        IObjectResolver container;
-        public IObjectResolver Container => container;
+        public IPresenter Presenter { get; private set; }
 
-        public ParentContainer(IObjectResolver container)
+        public ParentPresenter(IPresenter presenter)
         {
-            this.container = container;
-        }
-
-        public IModel GetIModel()
-        {
-            return container.Resolve<IModel>();
-        }
-
-        public IView GetIView()
-        {
-            return container.Resolve<IView>();
+            this.Presenter = presenter;
         }
     }
 
@@ -216,6 +212,8 @@ namespace MVP
         {
             if (data == null)
                 data = new T();
+            if (data is T == false)
+                throw new SystemException("Error");
             return (T)data;
         }
 

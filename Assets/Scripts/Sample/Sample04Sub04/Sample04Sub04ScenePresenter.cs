@@ -9,7 +9,5 @@ namespace Sample
             base(model, view, container)
         {
         }
-
-        protected override void Initialize() { }
     }
 }

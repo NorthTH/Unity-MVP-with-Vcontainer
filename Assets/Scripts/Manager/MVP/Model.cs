@@ -4,7 +4,7 @@ namespace MVP
     {
         public void SetUp(ISceneDataPack SceneDataPack);
         public void Initialize();
-        public void Refresh();
+        public void PostInitialize();
         public void ReceiveData(object data);
     }
 
@@ -19,7 +19,10 @@ namespace MVP
 
         public abstract void Initialize();
 
-        public virtual void Refresh() { }
+        public virtual void PostInitialize()
+        {
+            SceneDataPack.SetSceneComplete();
+        }
 
         public virtual void ReceiveData(object data) { }
     }

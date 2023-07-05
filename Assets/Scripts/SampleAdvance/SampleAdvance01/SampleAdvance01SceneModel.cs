@@ -6,7 +6,7 @@ namespace SampleAdvance
     {
         public SampleAdvance01SceneModel() { }
 
-        public override void Initialize() 
+        public override void Initialize()
         {
             SceneDataPack?.SetSceneComplete();
         }

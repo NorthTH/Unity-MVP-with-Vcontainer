@@ -24,8 +24,8 @@ namespace Sample
         void ReturnButton_OnClick()
         {
             var textList = inputList.Select(x => x.text).ToList();
-            var parentView = container.Resolve<ParentContainer>().GetIView();
-            parentView.ReceiveData(textList);
+            var parentPresenter = container.Resolve<ParentPresenter>().Presenter;
+            parentPresenter.ReceiveData(textList);
             _ = HistoryManager.ReturnScene();
         }
     }

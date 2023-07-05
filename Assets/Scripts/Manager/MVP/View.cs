@@ -4,8 +4,8 @@ namespace MVP
     {
         public void SetUp(ISceneDataPack SceneDataPack);
         public void Initialize();
+        public void PostInitialize();
         public void Refresh();
-        public void ReceiveData(object data);
     }
 
     public abstract class View : SealedMonoBehaviour, IView
@@ -19,8 +19,8 @@ namespace MVP
 
         public abstract void Initialize();
 
-        public virtual void Refresh() { }
+        public virtual void PostInitialize() { }
 
-        public virtual void ReceiveData(object data) { }
+        public virtual void Refresh() { }
     }
 }

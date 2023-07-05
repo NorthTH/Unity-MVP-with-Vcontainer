@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 using MVP;
 using VContainer;
 
@@ -25,8 +26,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         }, SetShowLoadingCurtain);
     }
 
-    public void SetShowLoadingCurtain(bool value)
+    public async UniTask SetShowLoadingCurtain(bool value)
     {
         Curtain.SetActive(value);
+        await UniTask.CompletedTask;
     }
 }
