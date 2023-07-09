@@ -80,10 +80,7 @@ namespace Tetris
         // ゲームオーバーフラグ
         private bool gameOver;
 
-        public override void Initialize()
-        {
-            SceneDataPack?.SetSceneComplete();
-        }
+        public override void Initialize() { }
 
         public override void PostInitialize()
         {
