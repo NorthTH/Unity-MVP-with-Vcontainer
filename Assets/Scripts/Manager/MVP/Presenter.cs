@@ -37,7 +37,7 @@ namespace MVP
         /// <summary>
         /// ModelとViewを関連付ける処理を実行する
         /// </summary>
-        public virtual void Bind() { }
+        protected virtual void Bind() { }
 
         public virtual void ReceiveData(object data)
         {
