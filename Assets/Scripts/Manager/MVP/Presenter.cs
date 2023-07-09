@@ -4,9 +4,9 @@ using VContainer;
 namespace MVP
 {
     public abstract class Presenter<TModel, TView> : IPresenter
-     where TModel : IModel where TView : IView
+        where TModel : IModel where TView : IView
     {
-        protected IObjectResolver Container;
+        protected IObjectResolver Container { get; }
         protected TModel Model { get; }
         protected TView View { get; }
 
@@ -21,25 +21,23 @@ namespace MVP
         {
             Debug.Log($"Initialize: {this}");
 
-            try
-            {
-                var sceceDataPack = Container.Resolve<ISceneDataPack>();
-                Model.SetUp(sceceDataPack);
-                View.SetUp(sceceDataPack);
-            }
-            catch
-            {
-                var sceceDataPack = HistoryManager.GetFirstTimeSceneDataPack();
-                Model.SetUp(sceceDataPack);
-                View.SetUp(sceceDataPack);
-                Debug.LogWarning("This Warning alway happen when first's scene loaded");
-            }
+            var sceceDataPack = HistoryManager.IsFirstTimeScene() ? HistoryManager.GetFirstTimeSceneDataPack() : Container.Resolve<ISceneDataPack>();
+            Model.SetUp(sceceDataPack);
+            View.SetUp(sceceDataPack);
+
             Model.Initialize();
             View.Initialize();
+
+            Bind();
 
             Model.PostInitialize();
             View.PostInitialize();
         }
+
+        /// <summary>
+        /// ModelとViewを関連付ける処理を実行する
+        /// </summary>
+        public virtual void Bind() { }
 
         public virtual void ReceiveData(object data)
         {
@@ -54,7 +52,14 @@ namespace MVP
 
     public interface IPresenter
     {
+        /// <summary>
+        /// 外部のコンテナのイベントにより、Presenter経由でdataを受け渡し、モデルでデータを処理し、ビューの画面更新する
+        /// </summary>
         void ReceiveData(object data);
+
+        /// <summary>
+        /// 外部のコンテナのイベントにより、Presenter経由でビューの画面更新する
+        /// </summary>
         void Refresh();
     }
 }

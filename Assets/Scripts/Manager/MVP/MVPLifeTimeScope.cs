@@ -22,18 +22,18 @@ namespace MVP
             builder.RegisterEntryPoint<EntryPoint>(Lifetime.Scoped);
         }
 
-        public class EntryPoint : IStartable
+        private class EntryPoint : IStartable
         {
-            TPresenter Presenter;
+            TPresenter presenter { get; }
 
-            private EntryPoint(TPresenter Presenter)
+            private EntryPoint(TPresenter presenter)
             {
-                this.Presenter = Presenter;
+                this.presenter = presenter;
             }
 
             public void Start()
             {
-                Presenter.Initialize();
+                presenter.Initialize();
             }
         }
 

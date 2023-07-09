@@ -12,9 +12,9 @@ namespace MVP
     {
         protected ISceneDataPack SceneDataPack;
 
-        public virtual void SetUp(ISceneDataPack SceneDataPack)
+        public virtual void SetUp(ISceneDataPack sceneDataPack)
         {
-            this.SceneDataPack = SceneDataPack;
+            SceneDataPack = sceneDataPack;
         }
 
         public abstract void Initialize();

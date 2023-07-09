@@ -100,7 +100,7 @@ namespace MVP
             var showCurtainTask = UniTask.CompletedTask;
             if (isShowCurtain)
             {
-                showCurtainTask = SetShowCurtain.Invoke(true);
+                showCurtainTask = SetShowCurtain?.Invoke(true) ?? UniTask.CompletedTask;
             }
 
             PreAction?.Invoke(sceneName);
@@ -117,7 +117,7 @@ namespace MVP
                     await utcs.Task;
                     if (mode == LoadSceneMode.Single)
                     {
-                        await SetShowCurtain.Invoke(false);
+                        await (SetShowCurtain?.Invoke(false) ?? UniTask.CompletedTask);
                     }
                 }).Forget();
             }
@@ -142,6 +142,9 @@ namespace MVP
             return utcs.Task;
         }
 
+        /// <summary>
+        /// 今からロードされるシーンと一番手前の現在のシーンを親子関係を繋ぐ
+        /// </summary>
         async UniTask InternalLoadScene(string sceneName, LoadSceneMode mode, SceneDataPack sceneDataPack, Action OnComplete)
         {
             if (mode == LoadSceneMode.Single)
@@ -150,6 +153,7 @@ namespace MVP
                 using (LifetimeScope.EnqueueParent(rootLifetimeScope))
                 using (LifetimeScope.Enqueue(builder =>
                 {
+                    // 今からロードするシーンにシーンデータの参照を渡す
                     builder.Register<SceneDataPack>(container =>
                     {
                         return sceneDataPack;
@@ -165,11 +169,14 @@ namespace MVP
                 using (LifetimeScope.EnqueueParent(parent))
                 using (LifetimeScope.Enqueue(builder =>
                 {
+                    // 今からロードするシーンに親のPresenterの参照を渡す
                     builder.Register<ParentPresenter>(container =>
                     {
                         var parentContainer = new ParentPresenter(parent.Container.Resolve<IPresenter>());
                         return parentContainer;
                     }, Lifetime.Scoped);
+
+                    // 今からロードするシーンにシーンデータの参照を渡す
                     builder.Register<SceneDataPack>(container =>
                     {
                         return sceneDataPack;
@@ -183,6 +190,10 @@ namespace MVP
         }
     }
 
+
+    /// <summary>
+    /// 親シーンのPresenterの参照を子シーンに引き渡すため、使用するためのClass。引き渡しの流れはWaterFall図です。
+    /// </summary>
     public class ParentPresenter
     {
         public IPresenter Presenter { get; private set; }
@@ -203,6 +214,9 @@ namespace MVP
             this.data = data;
         }
 
+        /// <summary>
+        /// シーンロード完了時にシーンロード非同期操作の完了通知を登録する
+        /// </summary>
         public void SetUniTaskCompletionSource(UniTaskCompletionSource sceneUtcs)
         {
             this.SceneUtcs = sceneUtcs;
@@ -210,10 +224,14 @@ namespace MVP
 
         public T GetData<T>() where T : notnull, new()
         {
-            if (data == null)
-                data = new T();
-            if (data is T == false)
-                throw new SystemException("Error");
+            // シーンデータがnullの場合、新しく生成する。
+            data ??= new T();
+
+            // 指定されたシーンデータの型と一致しない場合、例外を投げる
+            if (!(data is T))
+                throw new InvalidCastException($"SceneDataPackの型が一致しません。{typeof(T)}を指定してください。");
+
+            // シーンデータを渡す
             return (T)data;
         }
 
@@ -225,7 +243,14 @@ namespace MVP
 
     public interface ISceneDataPack
     {
+        /// <summary>
+        /// シーンデータを取得する。
+        /// </summary>
         public T GetData<T>() where T : notnull, new();
+
+        /// <summary>
+        /// シーンロード完了を通知する。
+        /// </summary>
         public void SetSceneComplete();
     }
 }

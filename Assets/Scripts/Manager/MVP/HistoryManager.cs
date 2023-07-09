@@ -19,6 +19,7 @@ namespace MVP
         public static string GetLastLoadedSceneName() => _history.Peek().scene;
         public static string GetPreviousLoadedSceneName() => actualAdditiveSceneName.Count > 1 ? actualAdditiveSceneName[actualAdditiveSceneName.Count - 2] : actualSingleSceneName;
         public static SceneDataPack GetFirstTimeSceneDataPack() => _history.Count == 1 ? _history.Peek().sceneDataPack : null;
+        public static bool IsFirstTimeScene() => _history.Count == 1;
 
         static Func<bool, UniTask> SetShowLoadingCurtain;
         static Func<string, LoadSceneMode, SceneDataPack, UniTask> LoadSceneAsync;
@@ -121,9 +122,9 @@ namespace MVP
         /// <summary>
         /// 履歴がある場合、ひとつ前のシーンに戻ります。
         /// </summary>
-        /// <param name="scene">指定しない場合最後に開いたシーンの名前と同じ名前のシーンを削除します。</param>
+        /// <param name="removeAdditiveScenes">trueの場合、Additiveシーンを全てアンロードし、Singleシーンの前の状態を全て再現する</param>
         /// <returns></returns>
-        public static async UniTask ReturnScene(bool DirectSingleReturn = false)
+        public static async UniTask ReturnScene(bool removeAdditiveScenes = false)
         {
             Debug.Assert(_history.Count != 0, "_history.Count != 0");
 
@@ -133,7 +134,7 @@ namespace MVP
                 return;
             }
 
-            if (DirectSingleReturn)
+            if (removeAdditiveScenes)
             {
                 await SetShowLoadingCurtain.Invoke(true);
                 await RemoveAllAdditiveScene();
@@ -149,7 +150,7 @@ namespace MVP
             switch (loadSceneMode)
             {
                 case LoadSceneMode.Single:
-                    if (DirectSingleReturn)
+                    if (removeAdditiveScenes)
                         await SetShowLoadingCurtain.Invoke(true);
                     actualAdditiveSceneName.Remove(currentScene);
 
