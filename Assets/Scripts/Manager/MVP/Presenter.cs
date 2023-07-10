@@ -17,7 +17,7 @@ namespace MVP
             Container = container;
         }
 
-        public void Initialize()
+        public async void Initialize()
         {
             Debug.Log($"Initialize: {this}");
 
@@ -27,6 +27,8 @@ namespace MVP
 
             Model.Initialize();
             View.Initialize();
+
+            await Model.LoadResource();
 
             Bind();
 

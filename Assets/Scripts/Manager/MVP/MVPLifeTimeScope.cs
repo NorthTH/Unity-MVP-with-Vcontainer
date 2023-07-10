@@ -5,9 +5,9 @@ using VContainer.Unity;
 namespace MVP
 {
     public abstract class MVPLifetimeScope<TPresenter, TModel, TView> : LifetimeScope, IMVPLifetimeScope
-       where TPresenter : Presenter<TModel, TView>
-       where TModel : Model
-       where TView : View
+        where TPresenter : Presenter<TModel, TView>
+        where TModel : Model
+        where TView : View
     {
         [SerializeField]
         protected TView view;
@@ -16,12 +16,16 @@ namespace MVP
         {
             base.Configure(builder);
 
+            /// PresenterのみSingletonであるため、外部コンテナはModelとViewの参照を取れなく、Presenterを介してのみ参照できる。
             builder.Register<TModel>(Lifetime.Scoped).AsSelf().AsImplementedInterfaces();
             builder.RegisterComponent(view).AsImplementedInterfaces();
             builder.Register<TPresenter>(Lifetime.Singleton).AsSelf().AsImplementedInterfaces();
             builder.RegisterEntryPoint<EntryPoint>(Lifetime.Scoped);
         }
 
+        /// <summary>
+        /// シーンがロードされた際、Presenterの初期化を行う
+        /// </summary>
         private class EntryPoint : IStartable
         {
             TPresenter presenter { get; }
