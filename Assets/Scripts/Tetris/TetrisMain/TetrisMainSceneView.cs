@@ -11,9 +11,13 @@ namespace Tetris
         public Action<KeyCode> UserInputKey;
 
         [SerializeField]
+        PopUpContainer popUpContainer;
+        [SerializeField]
         Transform blockParent;
         [SerializeField]
         Image blockPrefab;
+        [SerializeField]
+        Button pauseBtn;
 
         const int FieldWidth = 10;
         const int FieldHeight = 20;
@@ -25,6 +29,10 @@ namespace Tetris
 
         public override void Initialize()
         {
+            popUpContainer.Initialize();
+
+            pauseBtn.onClick.AddListener(PauseBtn_OnClick);
+
             blockBroad = new Image[FieldWidth, FieldHeight];
             for (int i = 0; i < FieldWidth; i++)
             {
@@ -116,6 +124,12 @@ namespace Tetris
         public void ShowGameOver()
         {
             Debug.Log("GameOver");
+        }
+
+        void PauseBtn_OnClick()
+        {
+            var pausePopUp = popUpContainer.CreatePopup<TetrisPasuePopUp>(10);
+            pausePopUp.Open();
         }
     }
 

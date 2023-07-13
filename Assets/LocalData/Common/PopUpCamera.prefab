@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5153383120370246830}
   - component: {fileID: 1186918307053943780}
-  - component: {fileID: 2632574113497925673}
-  - component: {fileID: 7838941878133801641}
+  - component: {fileID: 6894406462134002758}
   m_Layer: 0
-  m_Name: MainCamera
+  m_Name: PopUpCamera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -85,15 +84,7 @@ Camera:
   m_OcclusionCulling: 0
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &2632574113497925673
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4635992863758325710}
-  m_Enabled: 1
---- !u!114 &7838941878133801641
+--- !u!114 &6894406462134002758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -108,9 +99,9 @@ MonoBehaviour:
   m_RenderShadows: 1
   m_RequiresDepthTextureOption: 2
   m_RequiresOpaqueTextureOption: 2
-  m_CameraType: 0
+  m_CameraType: 1
   m_Cameras: []
-  m_RendererIndex: 0
+  m_RendererIndex: 1
   m_VolumeLayerMask:
     serializedVersion: 2
     m_Bits: 1
