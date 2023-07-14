@@ -34,8 +34,6 @@ namespace MVP
 
             Model.PostInitialize();
             View.PostInitialize();
-
-            sceceDataPack.SetSceneComplete();
         }
 
         /// <summary>

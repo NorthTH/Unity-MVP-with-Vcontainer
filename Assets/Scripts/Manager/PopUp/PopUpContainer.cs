@@ -12,17 +12,7 @@ public class PopUpContainer : MonoBehaviour
     List<PopUpBase> popUpObjList = new List<PopUpBase>();
 
     List<RebuildData> rebuildPopUpDataList;
-    List<PopUpBase> popUpList;
-
-    /// <summary>
-    /// 初期化時に必ず呼ぶ
-    /// </summary>
-    /// <param name="rebuildPopUpDataList">データ復元用</param>
-    public void Initialize(List<RebuildData> rebuildPopUpDataList = null)
-    {
-        this.rebuildPopUpDataList = rebuildPopUpDataList;
-        popUpList = new List<PopUpBase>();
-    }
+    List<PopUpBase> popUpList = new List<PopUpBase>();
 
     /// <summary>
     /// ポップアップの作成
@@ -52,9 +42,9 @@ public class PopUpContainer : MonoBehaviour
         return popUpBase as T;
     }
 
-    public void RebuildPopUpList()
+    public void RebuildPopUpList(List<RebuildData> rebuildPopUpDataList)
     {
-        if (rebuildPopUpDataList != null)
+        if (rebuildPopUpDataList.Count > 0)
         {
             foreach (var rebuildPopUpData in rebuildPopUpDataList)
             {
@@ -78,6 +68,10 @@ public class PopUpContainer : MonoBehaviour
                     popUpBase.WindowClose();
                 }
             }
+        }
+        else
+        {
+            this.rebuildPopUpDataList = rebuildPopUpDataList;
         }
     }
 

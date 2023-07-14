@@ -29,8 +29,6 @@ namespace Tetris
 
         public override void Initialize()
         {
-            popUpContainer.Initialize();
-
             pauseBtn.onClick.AddListener(PauseBtn_OnClick);
 
             blockBroad = new Image[FieldWidth, FieldHeight];
