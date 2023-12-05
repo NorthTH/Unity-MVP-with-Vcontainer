@@ -48,10 +48,7 @@ namespace MVP
             await UniTask.CompletedTask;
         }
 
-        public virtual void PostInitialize()
-        {
-            SceneDataPack.SetSceneComplete();
-        }
+        public virtual void PostInitialize() { }
 
         public virtual void ReceiveData(object data) { }
     }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using VContainer;
 
@@ -21,19 +22,32 @@ namespace MVP
         {
             Debug.Log($"Initialize: {this}");
 
-            var sceceDataPack = HistoryManager.IsFirstTimeScene() ? HistoryManager.GetFirstTimeSceneDataPack() : Container.Resolve<ISceneDataPack>();
-            Model.SetUp(sceceDataPack);
-            View.SetUp(sceceDataPack);
+            ISceneDataPack sceneDataPack = default;
+            try
+            {
+                sceneDataPack = HistoryManager.IsFirstTimeScene() ? HistoryManager.GetFirstTimeSceneDataPack() : Container.Resolve<ISceneDataPack>();
+                Model.SetUp(sceneDataPack);
+                View.SetUp(sceneDataPack);
 
-            Model.Initialize();
-            View.Initialize();
+                Model.Initialize();
+                View.Initialize();
 
-            await Model.LoadResource();
+                await Model.LoadResource();
 
-            Bind();
+                Bind();
 
-            Model.PostInitialize();
-            View.PostInitialize();
+                Model.PostInitialize();
+                View.PostInitialize();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(ex);
+                _ = ErrorManager.Instance.ShowError(ex);
+            }
+            finally
+            {
+                sceneDataPack?.SetSceneComplete();
+            }
         }
 
         /// <summary>

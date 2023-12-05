@@ -104,23 +104,28 @@ namespace MVP
                 var parentDirectory = _name + "/";
                 var nameSpace = _name.Replace("/", ".");
 
+                var entityPoint = new GameObject { name = "EntityPoint" };
+
                 // create camera
                 if (sceneMode == 0)
                 {
                     var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LocalData/Common/MainCamera.prefab");
-                    var cameraGo = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
-                    Debug.Assert(cameraGo != null, "cameraGo != null");
-                    mainCamera = cameraGo.GetComponent<Camera>();
+                    var cameraObj = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                    Debug.Assert(cameraObj != null, "cameraGo != null");
+                    mainCamera = cameraObj.GetComponent<Camera>();
+                    cameraObj.transform.parent = entityPoint.transform;
                 }
                 // Attach Manager
                 {
-                    _ = new GameObject { name = "SceneManager" };
+                    var sceneManager = new GameObject { name = "SceneManager" };
+                    sceneManager.transform.parent = entityPoint.transform;
                 }
                 // default canvas
                 {
                     var prefab =
                         AssetDatabase.LoadAssetAtPath<GameObject>("Assets/LocalData/Common/DefaultCanvas.prefab");
                     var canvas = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+                    canvas.transform.parent = entityPoint.transform;
                     if (sceneMode == 0)
                     {
                         Debug.Assert(canvas != null, "canvas != null");
@@ -198,7 +203,7 @@ namespace MVP
                     var sceneManager = GameObject.Find("SceneManager");
                     var view = sceneManager.AddComponent(GetType($"{scenePrefix}.{sceneName}View")) as View;
 
-                    var lifeTimeScopeObj = GameObject.Find("LifeTimeScope");
+                    var lifeTimeScopeObj = GameObject.Find("EntityPoint");
                     lifeTimeScopeObj = (lifeTimeScopeObj == null) ? new GameObject("LifeTimeScope") : lifeTimeScopeObj;
                     var lifeTimeScope = lifeTimeScopeObj.AddComponent(GetType($"{scenePrefix}.{sceneName}LifeTimeScope")) as IMVPLifetimeScope;
                     lifeTimeScope.SetView(view);

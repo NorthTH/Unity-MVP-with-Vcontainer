@@ -10,46 +10,48 @@ public class PopUpFrame : MonoBehaviour
     Canvas canvasBase;
 
     UniversalAdditionalCameraData mainCameraData;
-    Canvas Canvas;
+    Canvas canvas;
 
-    public T SetPopUpBase<T>(T popUpBase, int layer) where T : PopUpBase
+    // レンダリング定数定義
+    private const int PopUpRender = 2;
+    private const int DefaultRender = 0;
+
+    public T SetPopUpBase<T>(T popUpBase, int layer, bool isColorCurtain, bool isOverlay) where T : PopUpBase
     {
-        T PopUpBase = default;
+        T popUp = default;
 
         if (popUpBase.GetIsRootPopUp())
         {
             var canvas = popUpBase.GetCanvas();
             canvas.transform.SetParent(this.transform);
-            Canvas = canvas;
-            PopUpBase = popUpBase;
+            this.canvas = canvas;
+            popUp = popUpBase;
+            popUpCamera.depth = canvas.sortingOrder;
             DestroyImmediate(canvasBase.gameObject);
-            canvasBase = Canvas;
+            canvasBase = this.canvas;
         }
         else
         {
-            Canvas = canvasBase;
-            Canvas.sortingOrder = layer;
-            PopUpBase = Instantiate<T>(popUpBase, Canvas.transform);
-            PopUpBase.transform.SetParent(this.canvasBase.transform);
+            canvas = canvasBase;
+            canvas.sortingOrder = layer;
+            canvas.renderMode = (isOverlay) ? RenderMode.ScreenSpaceOverlay : RenderMode.ScreenSpaceCamera;
+            popUpCamera.depth = layer;
+            popUp = Instantiate<T>(popUpBase, canvas.transform);
+            popUp.transform.SetParent(this.canvasBase.transform);
         }
 
         mainCameraData = Camera.main.GetUniversalAdditionalCameraData();
 
-        // 既存のカメラを全てのレンダリング設定をデフォルトに戻す
-        foreach (var camera in mainCameraData.cameraStack)
-        {
-            var cameraStackData = camera.GetUniversalAdditionalCameraData();
-            cameraStackData.SetRenderer(0);
-        }
-
-        // ポップアップ用のカメラを設定
+        // ポップアップ用のカメラをメインカメラのStackに追加
         mainCameraData.cameraStack.Add(popUpCamera);
 
-        Canvas.worldCamera = popUpCamera;
+        // ポップアップ用のカメラをCanvasに設定
+        canvas.worldCamera = popUpCamera;
 
-        PopUpBase.PopUpFrame = this;
+        // ポップアップベースとフレームを紐づけ
+        popUp.PopUpFrame = this;
 
-        return PopUpBase;
+        return popUp;
     }
 
     void OnDestroy()
@@ -57,7 +59,22 @@ public class PopUpFrame : MonoBehaviour
         // ポップアップ用のカメラを削除
         mainCameraData.cameraStack.Remove(popUpCamera);
 
+        Sort();
+    }
+
+    void Sort()
+    {
+        // カメラStackをソート
+        mainCameraData.cameraStack.Sort((x, y) => x.depth.CompareTo(y.depth));
+
+        // 既存のカメラの全てのレンダリング設定をデフォルトに戻す
+        foreach (var camera in mainCameraData.cameraStack)
+        {
+            var cameraStackData = camera.GetUniversalAdditionalCameraData();
+            cameraStackData.SetRenderer(DefaultRender);
+        }
+
         // カメラStackが空ではない場合は最後のポップアップカメラを設定
-        mainCameraData.cameraStack.LastOrDefault()?.GetUniversalAdditionalCameraData().SetRenderer(2);
+        mainCameraData.cameraStack.LastOrDefault(x => x.isActiveAndEnabled)?.GetUniversalAdditionalCameraData().SetRenderer(PopUpRender);
     }
 }

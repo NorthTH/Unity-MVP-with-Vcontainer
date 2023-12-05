@@ -114,4 +114,6 @@ public class RebuildData
     public Type Type;
     public int Layer;
     public bool IsOpened;
+    public bool IsColor;
+    public bool IsOverlay;
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -19,20 +20,11 @@ namespace MVP
         public static SceneLoader Instance;
 
         readonly LifetimeScope rootLifetimeScope;
-        Dictionary<string, LifetimeScope> lifetimeScopeDic;
+        OrderedDictionary lifetimeScopeDic;
 
         Action<string> PreAction;
         Action<string> PostAction;
         Func<bool, UniTask> SetShowCurtain;
-
-        public IObjectResolver LastContainer
-        {
-            get
-            {
-                var lastLifetimeScope = (lifetimeScopeDic.Count == 0) ? rootLifetimeScope : lifetimeScopeDic.Last().Value;
-                return lastLifetimeScope.Container;
-            }
-        }
 
         public SceneLoader(LifetimeScope rootLifetimeScope)
         {
@@ -45,7 +37,7 @@ namespace MVP
         void Initialize()
         {
             Debug.Log("Initialize SceneLoader");
-            lifetimeScopeDic = new Dictionary<string, LifetimeScope>();
+            lifetimeScopeDic = new OrderedDictionary();
 
             SceneManager.sceneLoaded += (scene, mode) =>
             {
@@ -65,7 +57,7 @@ namespace MVP
             };
             SceneManager.sceneUnloaded += (scene) =>
             {
-                if (lifetimeScopeDic.ContainsKey(scene.name))
+                if (lifetimeScopeDic.Contains(scene.name))
                     lifetimeScopeDic.Remove(scene.name);
             };
         }
@@ -165,7 +157,7 @@ namespace MVP
             }
             else if (mode == LoadSceneMode.Additive)
             {
-                var parent = lifetimeScopeDic.Last().Value;
+                var parent = (LifetimeScope)lifetimeScopeDic[lifetimeScopeDic.Count - 1];
                 using (LifetimeScope.EnqueueParent(parent))
                 using (LifetimeScope.Enqueue(builder =>
                 {
@@ -187,6 +179,27 @@ namespace MVP
                 }
             }
             OnComplete.Invoke();
+        }
+
+        /// <summary>
+        /// LastScopeの親を辿って逆検索し、指定した(T)のLifetimeScopeのContainerを取得する
+        /// </summary>
+        public bool FindContainer<T>(out IObjectResolver? container) where T : LifetimeScope
+        {
+            container = default;
+            var currentScope = (lifetimeScopeDic.Count == 0) ? rootLifetimeScope : (LifetimeScope)lifetimeScopeDic[lifetimeScopeDic.Count - 1];
+            while (currentScope != null)
+            {
+                Debug.Log("Scope: " + currentScope.GetHashCode());
+                if (currentScope is T)
+                {
+                    container = currentScope.Container;
+                    return true;
+                }
+                currentScope = currentScope.Parent;
+            }
+
+            return false;
         }
     }
 

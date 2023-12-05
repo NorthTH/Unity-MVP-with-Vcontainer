@@ -18,14 +18,14 @@ public class PopUpContainer : MonoBehaviour
     /// ポップアップの作成
     /// </summary>
     /// <param name="Layer">CanvasのSortedOrder</param>
-    public T CreatePopup<T>(int Layer = 0) where T : PopUpBase
+    public T CreatePopup<T>(int Layer = 0, bool isColorCurtain = false, bool isOverlay = false) where T : PopUpBase
     {
         var popUp = popUpObjList.FirstOrDefault(x => x is T);
         if (popUp == default)
             throw new ArgumentException($"指定された情報が存在しませんでした。[ T : {typeof(T)} ]");
 
         var popUpFrame = Instantiate<PopUpFrame>(popUpFramePrefab, this.transform);
-        var popUpBase = popUpFrame.SetPopUpBase<T>(popUp as T, Layer);
+        var popUpBase = popUpFrame.SetPopUpBase<T>(popUp as T, Layer, isColorCurtain, isOverlay);
 
         popUpBase.SetPopUpController(this);
         popUpBase.Initialize();
@@ -36,6 +36,8 @@ public class PopUpContainer : MonoBehaviour
             popUpBase.Initialize();
             popUpBase.RebuildData.Type = popUpBase.GetType();
             popUpBase.RebuildData.Layer = Layer;
+            popUpBase.RebuildData.IsColor = isColorCurtain;
+            popUpBase.RebuildData.IsOverlay = isOverlay;
             rebuildPopUpDataList.Add(popUpBase.RebuildData);
         }
 
@@ -53,7 +55,7 @@ public class PopUpContainer : MonoBehaviour
                     continue;
 
                 var popUpFrame = Instantiate<PopUpFrame>(popUpFramePrefab, this.transform);
-                var popUpBase = popUpFrame.SetPopUpBase<PopUpBase>(rebuildPopUp, rebuildPopUpData.Layer);
+                var popUpBase = popUpFrame.SetPopUpBase<PopUpBase>(rebuildPopUp, rebuildPopUpData.Layer, rebuildPopUpData.IsColor, rebuildPopUpData.IsOverlay);
                 popUpBase.SetPopUpController(this);
                 popUpBase.Initialize();
                 popUpList.Add(popUpBase);

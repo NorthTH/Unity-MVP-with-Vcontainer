@@ -401,7 +401,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0, y: 735}
+  m_AnchoredPosition: {x: 0, y: 735}
   m_SizeDelta: {x: 400, y: 120}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &602033044
@@ -673,16 +673,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: PopUpContainer
       objectReference: {fileID: 0}
-    - target: {fileID: 4729350164238460494, guid: 04a5afb5257d44aac916b7fd89789443, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8281227356813482688, guid: 04a5afb5257d44aac916b7fd89789443, type: 3}
       propertyPath: popUpObjList.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8281227356813482688, guid: 04a5afb5257d44aac916b7fd89789443, type: 3}
-      propertyPath: popUpObjList.Array.data[0]
+      propertyPath: popUpObjList.Array.data[1]
       value: 
       objectReference: {fileID: 4311816883436480757, guid: 543f9aa8d7d334626ab3761e030b8d2f, type: 3}
     m_RemovedComponents: []

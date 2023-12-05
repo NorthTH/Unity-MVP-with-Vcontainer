@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4445902817295945440}
   - component: {fileID: 7062868608268747103}
+  - component: {fileID: 1732901967358052350}
   m_Layer: 0
   m_Name: OverScene
   m_TagString: Untagged
@@ -47,6 +48,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   touchBlockObj: {fileID: 4137507410594694557}
   Curtain: {fileID: 8149674136990497146}
+--- !u!114 &1732901967358052350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2550179757809323831}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b93791548752a47f9959c8ec37bf9a85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4137507410594694557
 GameObject:
   m_ObjectHideFlags: 0

@@ -18,7 +18,8 @@ MonoBehaviour:
   m_RendererFeatures:
   - {fileID: 2786924880122924646}
   - {fileID: 453924016427124958}
-  m_RendererFeatureMap: 66ce6ca76925ad26de4828ea7ca94c06
+  - {fileID: 3677702028532829676}
+  m_RendererFeatureMap: 66ce6ca76925ad26de4828ea7ca94c06eccd6e7882d20933
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 0}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -71,9 +72,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    shader: {fileID: 4800000, guid: 1449a05ad396b405190f657210cc7e61, type: 3}
-    blurSize: 2
-  renderPassEvent: 500
+    shader: {fileID: 4800000, guid: c60d25ed9c7c944cc9ca341ac4aeadde, type: 3}
+    sigma: 5
+    blurAmount: 2
+    blurDensityRatio: 1
+    color: {r: 0, g: 0, b: 0, a: 0}
+    kernelStep: 9
+  renderPassEvent: 450
   OrderInSortLayer: 0
 --- !u!114 &2786924880122924646
 MonoBehaviour:
@@ -97,3 +102,25 @@ MonoBehaviour:
       serializedVersion: 2
       m_Bits: 32
     PassNames: []
+--- !u!114 &3677702028532829676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 361f8b7eab55645818677b48c0c91ae2, type: 3}
+  m_Name: BlurOverlayLayerFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  settings:
+    shader: {fileID: 4800000, guid: c60d25ed9c7c944cc9ca341ac4aeadde, type: 3}
+    sigma: 5
+    blurAmount: 2
+    blurDensityRatio: 1
+    color: {r: 0, g: 0, b: 0, a: 0}
+    kernelStep: 54
+  renderPassEvent: 500
+  OrderInSortLayer: 0

@@ -10,64 +10,72 @@ public class BlurTargetLayerFeature : ScriptableRendererFeature
     public class Settings
     {
         public Shader shader;
-        [HideInInspector]
-        public float blurSize = 3.0f;
+        public float sigma = 5.0f;              // 使用していない
+        public float blurAmount = 2.0f;         // 使用していない
+        public float blurDensityRatio = 0f;
+        public Color color = new Color(0, 0, 0, 0);
+        [Range(0, 150)]
+        public uint kernelStep = 9;
     }
 
     class BlurTargetLayerPass : ScriptableRenderPass
     {
         private const string ProfilerTag = nameof(BlurTargetLayerPass);
 
-        RenderTargetHandle tempColorTarget1;
-        RenderTargetHandle tempColorTarget2;
+        RenderTargetHandle tempColorTarget;
         Settings settings;
 
         ScriptableRenderer renderer;
         RenderTargetIdentifier cameraTarget;
         Material material;
+        private BlurAdjuster blurAdjuster = new BlurAdjuster();
 
         public BlurTargetLayerPass(Settings Settings, RenderPassEvent RenderPassEvent)
         {
             settings = Settings;
             renderPassEvent = RenderPassEvent;
-            material = (settings.shader != null) ? new Material(settings.shader) : default;
+            material = new Material(settings.shader);
         }
 
         public void Setup(ScriptableRenderer renderer)
         {
-            tempColorTarget1.Init("_TempRT1");
-            tempColorTarget2.Init("_TempRT2");
+            tempColorTarget.Init("_TempRT");
             this.renderer = renderer;
 
             if (material != default)
             {
-                material.SetFloat("_Factor", settings.blurSize);
-                material.SetFloat("_Factor_Y", settings.blurSize);
-                material.SetFloat("_Range", 0);
-                material.SetFloat("_Range_Y", 0);
-                material.SetFloat("_Darkness", 0);
+                material.SetFloat("_Sigma", BlurAdjuster.Sigma);
+                material.SetFloat("_BlurAmount", BlurAdjuster.DefaultBlurAmount);
+                material.SetFloat("_KernelStep", BlurAdjuster.KernelStep);
+                material.SetColor("_Color", settings.color);
+                material.SetFloat("_BlurDensityRatio", settings.blurDensityRatio);
             }
         }
 
         public override void Configure(CommandBuffer cmd, RenderTextureDescriptor cameraTextureDescriptor)
         {
-            cmd.GetTemporaryRT(tempColorTarget1.id, cameraTextureDescriptor);
-            cmd.GetTemporaryRT(tempColorTarget2.id, cameraTextureDescriptor);
+            cmd.GetTemporaryRT(tempColorTarget.id, cameraTextureDescriptor);
         }
 
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
+            // blurAdjuster.AdjustBlur();
+
+            // Setup()で行っている
+            // material.SetFloat("_Sigma", BlurAdjuster.Sigma);
+            // material.SetFloat("_BlurAmount", BlurAdjuster.DefaultBlurAmount);  //TODO: fade考慮
+            // material.SetFloat("_KernelStep", BlurAdjuster.KernelStep);
+            // material.SetFloat("_BlurDensityRatio", settings.blurDensityRatio);
+
             this.cameraTarget = renderer.cameraColorTarget;
 
             CommandBuffer cmd = CommandBufferPool.Get(ProfilerTag);
             context.ExecuteCommandBuffer(cmd);
             cmd.Clear();
 
-            var temp1 = tempColorTarget1.Identifier();
-            var temp2 = tempColorTarget2.Identifier();
-            Blit(cmd, cameraTarget, temp1, material, 0);
-            Blit(cmd, temp1, temp2, material, 1);
-            Blit(cmd, temp2, cameraTarget);
+            var temp = tempColorTarget.Identifier();
+            Blit(cmd, cameraTarget, temp, material, 0);
+            Blit(cmd, temp, cameraTarget, material, 1);
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
@@ -75,8 +83,7 @@ public class BlurTargetLayerFeature : ScriptableRendererFeature
 
         public override void FrameCleanup(CommandBuffer cmd)
         {
-            cmd.ReleaseTemporaryRT(tempColorTarget1.id);
-            cmd.ReleaseTemporaryRT(tempColorTarget2.id);
+            cmd.ReleaseTemporaryRT(tempColorTarget.id);
         }
     }
 

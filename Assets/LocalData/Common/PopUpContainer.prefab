@@ -45,4 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   popUpFramePrefab: {fileID: 8028049215425132390, guid: 64772202d07e345d7b4621881ce0aca9, type: 3}
-  popUpObjList: []
+  popUpObjList:
+  - {fileID: 3370838223178203827, guid: 578eb1c277d5b4b0db88e4f45446b026, type: 3}
